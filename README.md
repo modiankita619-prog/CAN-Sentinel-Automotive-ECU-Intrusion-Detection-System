@@ -2,7 +2,7 @@
 
 **Project Code:** ITS/CS/1076 | **Group No:** 1 | **Domain:** Cyber Security | **Duration:** 3 Months
 **Status:** In Progress - MID Stage
-*Last Update: 16 Oct 2026 - Working on Ankita branch for MID Review | Commit Days: 6/10*
+*Last Update: 18 Oct 2026 - Working on Ankita branch for MID Review | Commit Days: 8/10*
 
 ### Team Members - Group No 1
 - Garima Verma
