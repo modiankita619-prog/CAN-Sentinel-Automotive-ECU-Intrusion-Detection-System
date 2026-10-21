@@ -10,8 +10,6 @@
 - Akhil Bojja
 - Hardik Mittal
 
----
-
 ### 1. Project Aim
 To design and develop an Intrusion Detection System (IDS) for automotive CAN (Controller Area Network) bus to detect and mitigate cyber-attacks targeting ECUs in real-time.
 
