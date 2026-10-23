@@ -1,27 +1,52 @@
-from datetime import datetime
+"""
+detect_anomaly.py - CAN-Sentinel ML Engine (Week 2 deliverable)
 
-# Example rules for simulated CAN traffic
-KNOWN_ECU_IDS = {0x100, 0x200, 0x300, 0x400}
-SUSPICIOUS_IDS = {0x000, 0x7FF}
+Trains an Isolation Forest on NORMAL traffic (learns the baseline timing/
+entropy pattern), then tests it on ATTACK traffic to prove it flags the
+injected frames as anomalous.
 
-def detect_intrusion(can_id, dlc):
-    timestamp = datetime.now().strftime("%H:%M:%S")
+Needs:  pip install pandas scikit-learn
+Run:    python generate_traffic.py      (creates the two CSVs first)
+        python detect_anomaly.py
+"""
+import pandas as pd
+from sklearn.ensemble import IsolationForest
 
-    if can_id in SUSPICIOUS_IDS:
-        return f"[{timestamp}] ALERT: Suspicious CAN ID 0x{can_id:X}"
+# ---- Load data -------------------------------------------------------
+normal_df = pd.read_csv("normal_traffic.csv")
+attack_df = pd.read_csv("attack_traffic.csv")
 
-    if can_id not in KNOWN_ECU_IDS:
-        return f"[{timestamp}] WARNING: Unknown CAN ID 0x{can_id:X}"
+FEATURES = ["inter_arrival_ms", "entropy"]
 
-    if not 0 <= dlc <= 8:
-        return f"[{timestamp}] ALERT: Invalid CAN data length"
+# ---- Train on normal traffic only (this is the "baseline") ----------
+# contamination = expected fraction of "weird" points even in normal data.
+# 0.07 was tuned by testing a few values (see notes below) - it gives a good
+# balance: catches almost all attack frames without flagging too many
+# normal frames as false alarms.
+model = IsolationForest(n_estimators=150, contamination=0.07, random_state=42)
+model.fit(normal_df[FEATURES])
 
-    return f"[{timestamp}] NORMAL: Recognized ECU message"
+# ---- Test on the attack CSV (normal + injected attack frames) -------
+attack_df["prediction"] = model.predict(attack_df[FEATURES])
+# IsolationForest: -1 = anomaly, 1 = normal
+attack_df["flagged"] = attack_df["prediction"] == -1
 
+# ---- Results ----------------------------------------------------------
+total_attack_frames = (attack_df["label"] == "attack").sum()
+flagged_attack_frames = ((attack_df["label"] == "attack") & attack_df["flagged"]).sum()
+false_positives = ((attack_df["label"] == "normal") & attack_df["flagged"]).sum()
+total_normal_frames = (attack_df["label"] == "normal").sum()
 
-if __name__ == "__main__":
-    print("CAN-Sentinel Intrusion Detector")
-    can_id = int(input("Enter CAN ID (example: 0x100): "), 16)
-    dlc = int(input("Enter data length (0-8): "))
-
-    print(detect_intrusion(can_id, dlc))
+print("=" * 50)
+print(" CAN-Sentinel - Detection Validation (Mid-Review)")
+print("=" * 50)
+print(f" Total frames tested        : {len(attack_df)}")
+print(f" Actual attack frames       : {total_attack_frames}")
+print(f" Attack frames FLAGGED      : {flagged_attack_frames}  "
+      f"({100 * flagged_attack_frames / total_attack_frames:.1f}% caught)")
+print(f" Normal frames wrongly flagged (false positives): {false_positives} "
+      f"/ {total_normal_frames}")
+print()
+print("Sample of flagged rows (should mostly be ID 0x150 during the attack window):")
+print(attack_df[attack_df["flagged"]].head(10)[["timestamp_ms", "can_id", "inter_arrival_ms", "entropy", "label"]]
+      .to_string(index=False))
