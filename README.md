@@ -53,8 +53,6 @@ Modern vehicles use CAN bus protocol (ISO 11898) which has no authentication and
 - **Day 8-9 - 26-27 Oct 2026:** Implemented real SocketCAN C modules (ecu_sim.c, attacker.c) and ran them on Ubuntu Linux via a bootable Live USB environment (after resolving a Windows Update service failure that blocked WSL2 on the primary dev machine). Ran the Simulation Audit (audit.sh): confirmed 0% packet loss, proving vcan0 correctly transmits and receives raw hexadecimal frames.
 - **Day 10 - 28 Oct 2026 (Week 3):** Built dashboard.py - native PyQt5 desktop app with live color-coded traffic view and a dynamic Threat Level gauge, integrated directly with the rule-based detection engine (including the RPM/Speed spoofing check). Implemented can_sniffer.c and realtime_detector.py for Live Integration - a real SocketCAN C sniffer forwards live vcan0 frames over a Unix Domain Socket to Python for sub-millisecond, real-time inference. Tested full live pipeline end-to-end on Ubuntu: confirmed frames were received and classified live, with alerts correctly raised in real time as attack traffic hit the bus.
 
-**Note on Date Groups:** Due to UTC cutoff (5:30 AM IST), Oct 11 late night commits + Oct 12 commits counted as single group in Infotact dashboard. Hence 4 days work = 3 groups initially.
-
 ### 8. How to Run
 
 **Python / ML side (Windows or Linux):**
