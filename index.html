@@ -14,6 +14,16 @@
         .member { background: #334155; padding: 8px 12px; border-radius: 20px; font-size: 14px; }
         h1 { margin:0; color: #38bdf8; }
         h2 { color: #38bdf8; }
+        .badge { background: #38bdf8; color: #0f172a; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; }
+        .badge-green { background: #4ade80; color: #0f172a; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; }
+        .progress-bar { background: #334155; height: 12px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { background: #4ade80; height: 100%; width: 80%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #334155; padding: 8px; text-align: left; }
+        th { background: #334155; color: #38bdf8; }
+        code { background: #0f172a; padding: 2px 6px; border-radius: 4px; color: #facc15; }
+        .week4 { border-left: 4px solid #4ade80; }
+        .highlight { color: #facc15; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -21,13 +31,16 @@
         <h1>🚗 CAN-Sentinel</h1>
         <p>Automotive ECU Intrusion Detection System</p>
         <p><strong>Project Code: ITS/CS/1076 | Group No: 1</strong></p>
+        <p><span class="badge">WEEK 4 - COUNTERMEASURES & REFINEMENT</span> <span class="badge-green">● MID REVIEW READY</span></p>
     </header>
 
     <div class="container">
         <div class="card">
             <h2>Project Aim</h2>
             <p>To detect and prevent cyber attacks on Vehicle CAN Bus network and protect ECUs from unauthorized intrusion.</p>
-            <p class="status">● Live Project - MID Review Ready</p>
+            <p class="status">● Live Project - Week 4 Completed (80%)</p>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <p style="font-size:13px; color:#94a3b8;">Week 1: Setup & CAN Basics | Week 2: Attack Simulation | Week 3: ML Detection | <b style="color:#4ade80;">Week 4: Countermeasures & Polish</b></p>
         </div>
 
         <div class="card">
@@ -39,6 +52,28 @@
             <p>✅ Real SocketCAN Simulation (vcan0, 0% packet loss)</p>
         </div>
 
+        <div class="card week4">
+            <h2>🛡️ Week 4 - NEW: Countermeasures & Defense</h2>
+            <p><span class="highlight">NEW in Week 4:</span> System now not only DETECTS attacks, it also BLOCKS & RESPONDS.</p>
+            <p>✅ <b>Error Injector (Bonus Task)</b> - <code>error_injector.py</code> - Injects CAN Error Frames to test ECU resilience</p>
+            <p>✅ <b>Defense Mechanism</b> - Auto-blocks malicious CAN IDs after detection</p>
+            <p>✅ <b>Alert System</b> - Real-time alerts for DoS / Spoofing / Fuzzing / Error Injection</p>
+            <p>✅ <b>Safe Mode</b> - ECU switches to safe state when attack threshold exceeded</p>
+            <p>✅ <b>Logging & Reporting</b> - All attacks logged with timestamp, ID, type</p>
+            <p>✅ <b>Refined Dashboard</b> - Improved UI, Live CAN Traffic, Attack Graph</p>
+        </div>
+
+        <div class="card week4">
+            <h2>📊 Week 4 - How Countermeasure Works</h2>
+            <table>
+                <tr><th>Attack Type</th><th>Detection</th><th>Countermeasure (Week 4)</th></tr>
+                <tr><td>DoS (0x000 Flood)</td><td>High frequency > 100 msg/sec</td><td>Block ID 0x000 + Rate Limit</td></tr>
+                <tr><td>Spoofing (Fake RPM)</td><td>Impossible value jump</td><td>Ignore Spoofed ID + Alert Driver</td></tr>
+                <tr><td>Fuzzing (Random ID)</td><td>Unknown ID pattern</td><td>Whitelist Filter + Block</td></tr>
+                <tr><td>Error Injection</td><td>Error Frame burst</td><td>Bus-Off Protection + Recovery</td></tr>
+            </table>
+        </div>
+
         <div class="card">
             <h2>Team Group No 1</h2>
             <div class="team">
@@ -47,16 +82,19 @@
                 <span class="member">Akhil Bojja</span>
                 <span class="member">Hardik Mittal</span>
             </div>
+            <p style="font-size:13px; color:#94a3b8; margin-top:10px;">Week 4 Contribution - Ankita: Error Injector + Countermeasure Logic + Dashboard Polish</p>
         </div>
 
         <div class="card">
             <h2>Tech Stack</h2>
-            <p>Python | python-can | Scikit-learn | Flask | HTML/CSS/JS | CAN Protocol</p>
+            <p>Python | python-can | Scikit-learn | Flask | HTML/CSS/JS | CAN Protocol | SocketCAN (vcan0)</p>
+            <p><b>New Files in Week 4:</b> <code>error_injector.py</code> | <code>countermeasure.py</code> | <code>defense.py</code></p>
         </div>
 
         <div class="card">
             <p><strong>Repository:</strong> CAN-Sentinel-Automotive-ECU-Intrusion-Detection-System</p>
-            <p><strong>Last Updated:</strong> Day 3 - 11 Oct 2026 | Status: In Development</p>
+            <p><strong>Last Updated:</strong> Week 4 - 4 Nov 2026 | Status: Countermeasures Done, Final Polish In Progress</p>
+            <p><strong>Next:</strong> Final Testing + Final Report + Demo Video</p>
         </div>
     </div>
 </body>
