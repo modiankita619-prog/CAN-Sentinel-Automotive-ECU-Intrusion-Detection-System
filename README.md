@@ -1,8 +1,8 @@
 # CAN-Sentinel: Automotive ECU Intrusion Detection System
 
 **Project Code:** ITS/CS/1076 | **Group No:** 1 | **Domain:** Cyber Security | **Duration:** 3 Months
-**Status:** In Progress - Week 3 Complete
-*Last Update: 28 Oct 2026 - Working on Ankita branch | Commit Days: 10/10*
+**Status:** In Progress - Week 4 Complete
+*Last Update: 5 Nov 2026 - Working on Ankita branch | Commit Days: 12/12*
 
 ### Team Members - Group No 1
 - Garima Verma
@@ -21,6 +21,7 @@ Modern vehicles use CAN bus protocol (ISO 11898) which has no authentication and
 2.  **Spoofing Attack:** Injecting fake RPM / Speed messages on ID 0x100 / 0x200, detected via physical value-plausibility checks (RPM 0-8000, Speed 0-200 km/h)
 3.  **Fuzzing Attack:** Injecting random CAN IDs (0x7FF, 0x123) with random data
 4.  **Frequency Anomaly:** Normal 40 frames/sec to >100 frames/sec under attack (ML-based detection)
+5.  **Error Injection Attack (NEW - Week 4):** Injecting CAN Error Frames to force ECU into Bus-Off state, detected via error frame burst pattern
 
 ### 4. Tech Stack
 - **Core:** Python, Pandas, NumPy
@@ -30,7 +31,7 @@ Modern vehicles use CAN bus protocol (ISO 11898) which has no authentication and
 - **Tools:** GitHub, VS Code, Infotact Portal, Ubuntu (Live USB)
 
 ### 5. System Architecture
-`Virtual CAN Bus (vcan0) -> Normal ECU Traffic + Attack Injector -> C Sniffer (Unix Domain Socket) -> Python IDS Engine (Rule-based + ML) -> Live Dashboard (PyQt)`
+`Virtual CAN Bus (vcan0) -> Normal ECU Traffic + Attack Injector -> C Sniffer (Unix Domain Socket) -> Python IDS Engine (Rule-based + ML) -> Countermeasure Engine (Block / Alert / Safe Mode) -> Live Dashboard (PyQt)`
 
 ### 6. Project Structure
 - `can_simulator.py` + `can_detector.py` - Python CAN traffic simulator & rule-based IDS (ID, DLC, and RPM/Speed value-plausibility checks)
@@ -41,7 +42,10 @@ Modern vehicles use CAN bus protocol (ISO 11898) which has no authentication and
 - `can_sniffer.c` - Real-time C sniffer forwarding live vcan0 frames over a Unix Domain Socket
 - `realtime_detector.py` - Live socket listener running sub-millisecond real-time inference
 - `dashboard.py` - PyQt5 desktop dashboard (live traffic view + Threat Level gauge)
-- `index.html` - Web dashboard (earlier prototype)
+- `index.html` - Web dashboard (Week 4 updated - Countermeasure view)
+- `error_injector.py` - **NEW Week 4 (Bonus)** - Injects CAN Error Frames to test ECU resilience & Bus-Off recovery
+- `countermeasure.py` - **NEW Week 4** - Defense engine: Auto-block malicious ID, Rate-Limit, Whitelist Filter
+- `defense.py` - **NEW Week 4** - Safe Mode + Alert System + Attack Logging
 
 ### 7. Day-wise Progress (As per Infotact)
 - **Day 1 - 10 Oct 2026:** Repository Created & Linked to Infotact Portal, main branch init
@@ -52,8 +56,20 @@ Modern vehicles use CAN bus protocol (ISO 11898) which has no authentication and
 - **Day 7 - 24 Oct 2026:** Fixed can_id/dlc mismatch bug between can_simulator.py and can_detector.py so IDS results always match the displayed frame. Built can_anomaly.py - Isolation Forest ML model trained on normal CAN timing/entropy patterns, validated at 99.6% attack detection rate against simulated attack traffic.
 - **Day 8-9 - 26-27 Oct 2026:** Implemented real SocketCAN C modules (ecu_sim.c, attacker.c) and ran them on Ubuntu Linux via a bootable Live USB environment (after resolving a Windows Update service failure that blocked WSL2 on the primary dev machine). Ran the Simulation Audit (audit.sh): confirmed 0% packet loss, proving vcan0 correctly transmits and receives raw hexadecimal frames.
 - **Day 10 - 28 Oct 2026 (Week 3):** Built dashboard.py - native PyQt5 desktop app with live color-coded traffic view and a dynamic Threat Level gauge, integrated directly with the rule-based detection engine (including the RPM/Speed spoofing check). Implemented can_sniffer.c and realtime_detector.py for Live Integration - a real SocketCAN C sniffer forwards live vcan0 frames over a Unix Domain Socket to Python for sub-millisecond, real-time inference. Tested full live pipeline end-to-end on Ubuntu: confirmed frames were received and classified live, with alerts correctly raised in real time as attack traffic hit the bus.
+- **Day 11 - 3 Nov 2026 (Week 4):** Implemented `error_injector.py` (Bonus Task) - Injects CAN Error Frames to simulate Bus-Off attack and test ECU resilience. Tested error burst detection and recovery logic.
+- **Day 12 - 5 Nov 2026 (Week 4):** Implemented Countermeasure Engine - `countermeasure.py` + `defense.py` - System now BLOCKS malicious IDs, triggers Safe Mode when attack threshold exceeded, and logs all attacks with timestamp. Refined & Polished `index.html` and `dashboard.py` - Added Week 4 Countermeasure view, Attack vs Defense table, Progress bar (80% Complete). Project ready for Final Testing & Report.
 
-### 8. How to Run
+### 8. Week 4 - Countermeasures (How Defense Works)
+| Attack Type | Detection | Countermeasure |
+| :--- | :--- | :--- |
+| DoS (0x000 Flood) | High frequency > 100 msg/sec | Block ID 0x000 + Rate Limit |
+| Spoofing (Fake RPM) | Impossible value jump | Ignore Spoofed ID + Alert Driver |
+| Fuzzing (Random ID) | Unknown ID pattern | Whitelist Filter + Block |
+| Error Injection | Error Frame burst | Bus-Off Protection + Auto Recovery |
+
+**Defense Flow:** `Detect Attack -> Log Attack -> Block Malicious ID -> Alert Dashboard -> Enter Safe Mode if Critical -> Auto-Recover`
+
+### 9. How to Run
 
 **Python / ML side (Windows or Linux):**
 ```bash
@@ -61,28 +77,3 @@ pip install -r requirements.txt
 python can_simulator.py
 python can_generate_traffic.py
 python can_anomaly.py
-```
-
-**Dashboard UI (Windows or Linux):**
-```bash
-pip install PyQt5
-python dashboard.py
-```
-
-**C / SocketCAN side (requires Linux):**
-```bash
-sudo ./setup_vcan.sh
-gcc -O2 -Wall -o ecu_sim ecu_sim.c -lm && ./ecu_sim vcan0
-gcc -O2 -Wall -o attacker attacker.c && ./attacker vcan0
-./audit.sh 10
-```
-
-**Live Integration - real-time detection (requires Linux, 2 terminals):**
-```bash
-# Terminal 1:
-python3 realtime_detector.py
-
-# Terminal 2:
-gcc -O2 -Wall -o can_sniffer can_sniffer.c
-./can_sniffer vcan0 /tmp/can_sentinel.sock
-```
