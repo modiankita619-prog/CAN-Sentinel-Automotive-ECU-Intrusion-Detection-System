@@ -1,79 +1,220 @@
-# CAN-Sentinel: Automotive ECU Intrusion Detection System
+# 🚗 CAN-Sentinel: Automotive ECU Intrusion Detection System
 
-**Project Code:** ITS/CS/1076 | **Group No:** 1 | **Domain:** Cyber Security | **Duration:** 3 Months
-**Status:** In Progress - Week 4 Complete
-*Last Update: 5 Nov 2026 - Working on Ankita branch | Commit Days: 12/12*
+> **Project Code:** `ITS/CS/1076` | **Group No:** `1` | **Domain:** `Cyber Security`
+> **Status:** ✅ `100% COMPLETED` | **Last Update:** `10 Nov 2026`
+┌──────────────────────────────────────────────────────┐
+│  🚗 CAN-SENTINEL - FINAL REVIEW READY                |
+│  Detects + Blocks CAN Bus Attacks in < 1ms           |
+│  Rule + ML + Error Frame Defense                     | 
+└──────────────────────────────────────────────────────┘                     │
 
-### Team Members - Group No 1
-- Garima Verma
-- Ankita Modi
-- Akhil Bojja
-- Hardik Mittal
+### 👥 Team - Group 1
+┌──────────────────┬──────────────────────────────────────┐
+│ Garima Verma     │ ML Model & Research                  │
+├──────────────────┼──────────────────────────────────────┤
+│ Ankita Modi      │ Dashboard & Simulator (MAIN)         │
+│                  │ + Countermeasure + Docs              │
+├──────────────────┼──────────────────────────────────────┤
+│ Akhil Bojja      │ C Modules & SocketCAN                │
+├──────────────────┼──────────────────────────────────────┤
+│ Hardik Mittal    │ Attack Simulation & Testing          │
+└──────────────────┴──────────────────────────────────────┘
 
-### 1. Project Aim
-To design and develop an Intrusion Detection System (IDS) for automotive CAN (Controller Area Network) bus to detect and mitigate cyber-attacks targeting ECUs in real-time.
+### 📊 Final Results
+┌──────────────────────┬───────────────────┐
+│ Completion           │ 100%              │
+├──────────────────────┼───────────────────┤
+│ Detection Accuracy   │ 99.6%             │
+├──────────────────────┼───────────────────┤
+│ Response Time        │ < 1 ms            │
+├──────────────────────┼───────────────────┤
+│ Packet Loss          │ 0% on vcan0       │
+├──────────────────────┼───────────────────┤
+│ Attacks Blocked      │ 4 / 4             │
+└──────────────────────┴───────────────────┘
 
-### 2. Problem Statement
-Modern vehicles use CAN bus protocol (ISO 11898) which has no authentication and encryption. Attackers can inject malicious frames via OBD-II port or wireless interfaces, causing critical safety risks like brake failure and fake sensor readings. This project builds a defense layer to detect such intrusions.
+---
 
-### 3. Types of Attacks Detected
-1.  **DoS Attack:** Flooding the bus with high-priority ID 0x000 @ 10ms interval
-2.  **Spoofing Attack:** Injecting fake RPM / Speed messages on ID 0x100 / 0x200, detected via physical value-plausibility checks (RPM 0-8000, Speed 0-200 km/h)
-3.  **Fuzzing Attack:** Injecting random CAN IDs (0x7FF, 0x123) with random data
-4.  **Frequency Anomaly:** Normal 40 frames/sec to >100 frames/sec under attack (ML-based detection)
-5.  **Error Injection Attack (NEW - Week 4):** Injecting CAN Error Frames to force ECU into Bus-Off state, detected via error frame burst pattern
+### 🎯 1. Project Aim
+To design and develop an IDS for automotive CAN bus to detect and mitigate cyber-attacks targeting ECUs in real-time.
 
-### 4. Tech Stack
-- **Core:** Python, Pandas, NumPy
-- **Detection:** Scikit-Learn (Isolation Forest), Rule-based IDS
-- **Dashboard:** PyQt5 (native desktop) + HTML/CSS/JS (web prototype)
-- **Low-Level:** C, Linux SocketCAN, GCC, Unix Domain Sockets
-- **Tools:** GitHub, VS Code, Infotact Portal, Ubuntu (Live USB)
+### ❌ 2. Problem Statement
+Modern vehicles use CAN bus (ISO 11898) which has **no authentication and no encryption**.
+Attacker can inject fake frames via OBD-II → brake failure, fake RPM.
 
-### 5. System Architecture
-`Virtual CAN Bus (vcan0) -> Normal ECU Traffic + Attack Injector -> C Sniffer (Unix Domain Socket) -> Python IDS Engine (Rule-based + ML) -> Countermeasure Engine (Block / Alert / Safe Mode) -> Live Dashboard (PyQt)`
+---
 
-### 6. Project Structure
-- `can_simulator.py` + `can_detector.py` - Python CAN traffic simulator & rule-based IDS (ID, DLC, and RPM/Speed value-plausibility checks)
-- `can_generate_traffic.py` - CSV traffic logger for ML training
-- `can_anomaly.py` - Isolation Forest anomaly detection model
-- `ecu_sim.c` + `attacker.c` - Real SocketCAN C modules (vcan0 ECU simulator & attack injector)
-- `setup_vcan.sh` + `audit.sh` - vcan0 setup and packet-loss audit script
-- `can_sniffer.c` - Real-time C sniffer forwarding live vcan0 frames over a Unix Domain Socket
-- `realtime_detector.py` - Live socket listener running sub-millisecond real-time inference
-- `dashboard.py` - PyQt5 desktop dashboard (live traffic view + Threat Level gauge)
-- `index.html` - Web dashboard (Week 4 updated - Countermeasure view)
-- `error_injector.py` - **NEW Week 4 (Bonus)** - Injects CAN Error Frames to test ECU resilience & Bus-Off recovery
-- `countermeasure.py` - **NEW Week 4** - Defense engine: Auto-block malicious ID, Rate-Limit, Whitelist Filter
-- `defense.py` - **NEW Week 4** - Safe Mode + Alert System + Attack Logging
+### 🏗️ 3. BLOCK DIAGRAM - System Architecture
 
-### 7. Day-wise Progress (As per Infotact)
-- **Day 1 - 10 Oct 2026:** Repository Created & Linked to Infotact Portal, main branch init
-- **Day 2 - 11 Oct 2026:** Created index.html dashboard (CAN matrix, threat gauge) + Detailed README
-- **Day 3 - 12 Oct 2026:** Created can_simulator.py - Simulated 20 CAN frames (4 ECUs: 0x0C0,0x0D0,0x0B0,0x0A0), Normal/Anomaly 80/20, DLC=8, Tested in Terminal
-- **Day 4 - 13 Oct 2026:** Implemented can_attacker.py - DoS Flood (ID 0x000 @10ms) + Brake Spoofing - Tested 30 malicious frames
-- **Day 5-6 - 14-16 Oct 2026:** Added can_utils.py, can_detector.py - Fixed anomaly logic (int/string ID handling), Integrated IDS with simulator. Current Stats: 15 Commits, 6 Date Groups, 15 Files, 350 LOC
-- **Day 7 - 24 Oct 2026:** Fixed can_id/dlc mismatch bug between can_simulator.py and can_detector.py so IDS results always match the displayed frame. Built can_anomaly.py - Isolation Forest ML model trained on normal CAN timing/entropy patterns, validated at 99.6% attack detection rate against simulated attack traffic.
-- **Day 8-9 - 26-27 Oct 2026:** Implemented real SocketCAN C modules (ecu_sim.c, attacker.c) and ran them on Ubuntu Linux via a bootable Live USB environment (after resolving a Windows Update service failure that blocked WSL2 on the primary dev machine). Ran the Simulation Audit (audit.sh): confirmed 0% packet loss, proving vcan0 correctly transmits and receives raw hexadecimal frames.
-- **Day 10 - 28 Oct 2026 (Week 3):** Built dashboard.py - native PyQt5 desktop app with live color-coded traffic view and a dynamic Threat Level gauge, integrated directly with the rule-based detection engine (including the RPM/Speed spoofing check). Implemented can_sniffer.c and realtime_detector.py for Live Integration - a real SocketCAN C sniffer forwards live vcan0 frames over a Unix Domain Socket to Python for sub-millisecond, real-time inference. Tested full live pipeline end-to-end on Ubuntu: confirmed frames were received and classified live, with alerts correctly raised in real time as attack traffic hit the bus.
-- **Day 11 - 3 Nov 2026 (Week 4):** Implemented `error_injector.py` (Bonus Task) - Injects CAN Error Frames to simulate Bus-Off attack and test ECU resilience. Tested error burst detection and recovery logic.
-- **Day 12 - 5 Nov 2026 (Week 4):** Implemented Countermeasure Engine - `countermeasure.py` + `defense.py` - System now BLOCKS malicious IDs, triggers Safe Mode when attack threshold exceeded, and logs all attacks with timestamp. Refined & Polished `index.html` and `dashboard.py` - Added Week 4 Countermeasure view, Attack vs Defense table, Progress bar (80% Complete). Project ready for Final Testing & Report.
+```mermaid
+flowchart LR
+    A[🚗 ECUs<br/>Engine 0x0C5<br/>Brakes 0x0B0<br/>Steering 0x0A0] --> B[CAN Bus<br/>vcan0]
+    B --> C[⚔️ Attacker<br/>DoS / Spoofing<br/>Fuzzing / Error]
+    C --> B
+    B --> D[C Sniffer<br/>can_sniffer.c]
+    D --> E[🧠 IDS Engine<br/>Rule + ML]
+    E --> F{Attack?}
+    F -->|NO| G[✅ Normal]
+    F -->|YES| H[🛡️ Countermeasure<br/>Error Frame + Block]
+    H --> I[📊 Dashboard]
+    G --> I
+    📦 BLOCK DIAGRAM - ASCII Version
+                        ┌──────────────────┐
+                    │   ⚔️ ATTACKER    │
+                    │ DoS / Spoofing   │
+                    │ Fuzzing / Error  │
+                    └────────┬─────────┘
+                             │
+                             ▼
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│  🚗 ECUs     │─────▶│  CAN BUS     │─────▶│  C SNIFFER   │
+│ Engine 0x0C5 │      │  vcan0       │      │ can_sniffer.c│
+│ Brakes 0x0B0 │      │ SocketCAN    │      │ Unix Socket  │
+│ Steering 0x0A0│      └──────────────┘      └──────┬───────┘
+└──────────────┘                                     │
+                                                     ▼
+                                              ┌──────────────┐
+                                              │ 🧠 IDS ENGINE│
+                                              │ Rule + ML    │
+                                              │ Isolation    │
+                                              │ Forest 99.6% │
+                                              └──────┬───────┘
+                                                     │
+                                        ┌────────────┴────────────┐
+                                        │       Attack ?          │
+                                        └────────────┬────────────┘
+                                   NO ┌─────────────┴─────────────┐ YES
+                                      ▼                             ▼
+                              ┌──────────────┐            ┌──────────────────┐
+                              │ ✅ NORMAL    │            │ 🛡️ COUNTERMEASURE│
+                              │ Show on      │            │ Error Frame      │
+                              │ Dashboard    │            │ Block ID         │
+                              └──────┬───────┘            │ Safe Mode + Alert│
+                                     │                    └────────┬─────────┘
+                                     └──────────┬──────────────────┘
+                                                ▼
+                                     ┌──────────────────┐
+                                     │ 📊 DASHBOARD     │
+                                     │ PyQt5 + HTML     │
+                                     │ Live Traffic     │
+                                     │ Threat Gauge     │
+                                     │ Car Diagram      │
+                                     └──────────────────┘
+🔁 DEFENSE FLOW DIAGRAM
 
-### 8. Week 4 - Countermeasures (How Defense Works)
-| Attack Type | Detection | Countermeasure |
-| :--- | :--- | :--- |
-| DoS (0x000 Flood) | High frequency > 100 msg/sec | Block ID 0x000 + Rate Limit |
-| Spoofing (Fake RPM) | Impossible value jump | Ignore Spoofed ID + Alert Driver |
-| Fuzzing (Random ID) | Unknown ID pattern | Whitelist Filter + Block |
-| Error Injection | Error Frame burst | Bus-Off Protection + Auto Recovery |
+                                                         ┌─────────────┐
+│ Live Frame  │
+└──────┬──────┘
+       ▼
+┌─────────────┐     ┌─────────────┐
+│ Rule Check  │────▶│  ML Check   │
+│ ID/DLC/RPM  │     │ Iso Forest  │
+└──────┬──────┘     └──────┬──────┘
+       │                   │
+       ▼                   ▼
+   [Normal]          [🚨 ATTACK]
+                        │
+                        ▼
+               ┌────────────────┐
+               │ Log Attack     │
+               │ Time + ID + Type│
+               └───────┬────────┘
+                       ▼
+               ┌────────────────┐
+               │ Inject Error   │
+               │ Frame - Destroy│
+               │ Packet Mid-Flight│
+               └───────┬────────┘
+                       ▼
+               ┌────────────────┐
+               │ Block Bad ID   │
+               └───────┬────────┘
+                       ▼
+               ┌────────────────┐
+               │ Alert Dashboard│
+               └───────┬────────┘
+                       ▼
+               ┌────────────────┐
+               │ Safe Mode ?    │
+               │ If Critical    │
+               └───────┬────────┘
+                       ▼
+               ┌────────────────┐
+               │ Auto-Recover   │
+               └────────────────┘
+               🚗 CAR DIAGRAM - Which ECU Under Attack?
+                       ┌───────────────────────────────────────┐
+        │        🚗 CAN-SENTINEL CAR VIEW        │
+        ├───────────────────────────────────────┤
+        │  [ Engine 0x0C5 ]  RPM 3200           │
+        │  Status: ✅ NORMAL                     │
+        │                                       │
+        │  [ Steering 0x0A0 ]  Angle 15°        │
+        │  Status: ✅ NORMAL                     │
+        │                                       │
+        │  [ Brake 0x0B0 ]  🔴 ATTACK           │
+        │  Brake: SPOOFED                       │
+        │  Status: 🚨 BLOCKED                   │
+        │  Action: ID BLOCKED                   │
+        │                                       │
+        │  [ Speed 0x0D0 ]  60 km/h             │
+        │  Status: ✅ NORMAL                     │
+        ├───────────────────────────────────────┤
+        │  THREAT: ████████░░ HIGH 78%          │
+        │  BUS: vcan0 | Blocked: 12             │
+        └───────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│  ✅ ALL 4 ATTACKS DETECTED + BLOCKED                         │
+│  DoS ✅ | Spoofing ✅ | Fuzzing ✅ | Error Injection ✅      │
+└──────────────────────────────────────────────────────────────┘
+💻 4. Tech Stack
+┌──────────────┬──────────────────────────────────────────────┐
+│ Core         │ Python, C, Pandas, NumPy                     │
+├──────────────┼──────────────────────────────────────────────┤
+│ Detection    │ Scikit-Learn Isolation Forest + Rule IDS    │
+├──────────────┼──────────────────────────────────────────────┤
+│ Dashboard    │ PyQt5 + HTML/CSS/JS                         │
+├──────────────┼──────────────────────────────────────────────┤
+│ Low-Level    │ C, SocketCAN, GCC, Unix Domain Sockets      │
+├──────────────┼──────────────────────────────────────────────┤
+│ Tools        │ GitHub, VS Code, Ubuntu Live USB            │
+└──────────────┴──────────────────────────────────────────────┘
+📁 5. Project Structure
+CAN-Sentinel/
+├── can_simulator.py       # 4 ECUs Simulator
+├── can_detector.py        # Rule IDS
+├── can_attacker.py        # DoS + Spoofing
+├── can_anomaly.py         # ML Model 99.6%
+├── ecu_sim.c              # C ECU vcan0
+├── attacker.c             # C Attacker
+├── can_sniffer.c          # Live Sniffer
+├── realtime_detector.py   # Sub-ms Inference
+├── dashboard.py           # PyQt5 Dashboard
+├── index.html             # Web Dashboard 100%
+├── error_injector.py      # [Week 4] Error Frame
+├── countermeasure.py      # [Week 4] Block + Rate Limit
+├── defense.py             # [Week 4] Safe Mode + Alert
+└── README.md
 
-**Defense Flow:** `Detect Attack -> Log Attack -> Block Malicious ID -> Alert Dashboard -> Enter Safe Mode if Critical -> Auto-Recover`
+🛡️ 6. Week 4 - Countermeasures
+Detect → Log → Error Frame → Block ID → Alert → Safe Mode → Auto-Recover
 
-### 9. How to Run
+▶️ 7. How To Run
+sudo modprobe vcan
+sudo ip link add dev vcan0 type vcan
+sudo ip link set up vcan0
+python3 can_simulator.py
+python3 dashboard.py
+python3 can_attacker.py
+bash audit.sh
 
-**Python / ML side (Windows or Linux):**
-```bash
-pip install -r requirements.txt
-python can_simulator.py
-python can_generate_traffic.py
-python can_anomaly.py
+🏆 8. Final Results
+┌──────────────────────────────────────────────────┐
+│ ✅ Final Report + Demo Video Ready               │
+│ ✅ Final Presentation + Viva - Ready              │
+│ ✅ Project 100% Completed                        │
+└──────────────────────────────────────────────────┘
+
+
+
+                                     
